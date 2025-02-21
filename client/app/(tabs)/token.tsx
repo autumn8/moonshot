@@ -1,11 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
-import TokenHeader from '../components/token-header/token-header';
+import TokenHeader from '../screens/token/components/token-header';
+import TokenSearch from '../screens/token/components/token-search';
 
 export default function TokenScreen() {
   return (
     <View style={styles.container}>
       <TokenHeader />
-      <Text style={styles.text}>Token screen</Text>
+      <TokenSearch />
     </View>
   );
 }

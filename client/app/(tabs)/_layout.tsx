@@ -7,7 +7,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Home',
+          title: '',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'home' : 'home-outline'}
@@ -20,7 +20,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="asset-and-wallet"
         options={{
-          title: 'Asset/Wallet',
+          title: '',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'wallet' : 'wallet-outline'}
@@ -31,9 +31,9 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="tokens"
+        name="token"
         options={{
-          title: 'Tokens',
+          title: '',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'search' : 'search-outline'}
@@ -46,7 +46,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="wait"
         options={{
-          title: 'Wait',
+          title: '',
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'time' : 'time-outline'}
