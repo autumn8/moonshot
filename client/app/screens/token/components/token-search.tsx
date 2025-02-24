@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-export default function TokenSearch() {
+const TokenSearch = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   return (
@@ -10,7 +10,6 @@ export default function TokenSearch() {
       <View style={styles.iconContainer}>
         <Ionicons name="search" size={20} />
       </View>
-
       <TextInput
         placeholder="Search"
         style={styles.searchBar}
@@ -21,7 +20,9 @@ export default function TokenSearch() {
       <Text>{searchTerm}</Text>
     </View>
   );
-}
+};
+
+export default TokenSearch;
 
 const styles = StyleSheet.create({
   container: {
