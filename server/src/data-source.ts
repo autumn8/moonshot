@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
-import { User } from './entity/User';
 import 'dotenv/config';
+import { Token } from './entity/Token';
 
 export const AppDataSource = new DataSource({
   type: 'postgres',
@@ -12,7 +12,7 @@ export const AppDataSource = new DataSource({
   database: process.env.POSTGRES_DB,
   synchronize: true,
   logging: false,
-  entities: [User],
+  entities: [Token],
   migrations: [],
   subscribers: [],
 });

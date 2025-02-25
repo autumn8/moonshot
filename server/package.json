@@ -10,14 +10,18 @@
     "typescript": "4.5.2"
   },
   "dependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "pg": "^8.4.0",
     "reflect-metadata": "^0.1.13",
     "typeorm": "0.3.20"
   },
   "scripts": {
     "start": "ts-node src/index.ts",
-    "import:tokens": "ts-node src/importer/api-token-importer.ts",
+    "import:tokens": "ts-node src/helpers/api-token-importer.ts",
     "typeorm": "typeorm-ts-node-commonjs"
   }
 }

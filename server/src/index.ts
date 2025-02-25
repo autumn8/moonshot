@@ -1,20 +1,44 @@
-import { AppDataSource } from "./data-source"
-import { User } from "./entity/User"
+import { AppDataSource } from './data-source';
+import { User } from './entity/User';
+import express, { Request, Response } from 'express';
+import cors from 'cors';
+import { Token } from './entity/Token';
+import { authenticateApiKey } from './middleware/authenticate-api-key';
 
-AppDataSource.initialize().then(async () => {
+const app = express();
+const port = process.env.PORT || 3000;
 
-    console.log("Inserting a new user into the database...")
-    const user = new User()
-    user.firstName = "Timber"
-    user.lastName = "Saw"
-    user.age = 25
-    await AppDataSource.manager.save(user)
-    console.log("Saved a new user with id: " + user.id)
+app.use(express.json());
 
-    console.log("Loading users from the database...")
-    const users = await AppDataSource.manager.find(User)
-    console.log("Loaded users: ", users)
+app.use(
+  cors({
+    origin: '*',
+    methods: ['GET'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  })
+);
 
-    console.log("Here you can setup and run express / fastify / any other framework.")
+AppDataSource.initialize()
+  .then(async () => {
+    const tokenRepository = AppDataSource.getRepository(Token);
 
-}).catch(error => console.log(error))
+    app.get(
+      '/tokens',
+      authenticateApiKey,
+      async (req: Request, res: Response) => {
+        const tokens = await tokenRepository.find();
+        try {
+          const tokens = await tokenRepository.find();
+          res.status(200).json(tokens);
+        } catch {
+          res.status(500).json({ message: 'Error retrieving tokens' });
+        }
+      }
+    );
+
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  })
+  .catch((error) => console.log(error));
