@@ -1,32 +1,28 @@
 import { useEffect, useState } from 'react';
-import { fetchCurrencies } from '../services/currencies.service';
-import {
-  Currency,
-  CurrencyType,
-  MoonError,
-} from '../services/currencies.types';
+import { fetchTokens } from '../services/tokens.service';
+import { MoonError, Token } from '../services/tokens.types';
 
-export const useCurrencies = (type: CurrencyType) => {
+export const useTokens = () => {
   const [loading, setLoading] = useState(false);
-  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [tokens, setTokens] = useState<Token[]>([]);
   const [error, setError] = useState<MoonError | null>(null);
 
   useEffect(() => {
-    const getCurrencies = async () => {
-      const response = await fetchCurrencies();
+    const getTokens = async () => {
+      const response = await fetchTokens();
       if (!response.success) {
         setError(response.error);
         return;
       }
-      setCurrencies(response.data.filter((currency) => currency.type === type));
+      setTokens(response.data);
       setLoading(false);
     };
-    getCurrencies();
-  });
+    getTokens();
+  }, []);
 
   return {
     loading,
     error,
-    currencies,
+    tokens,
   };
 };
