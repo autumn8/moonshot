@@ -3,6 +3,7 @@ import { View } from 'react-native-reanimated/src/Animated';
 import { Image, Text, StyleSheet } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 import { Token } from '@/app/services/tokens.types';
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 interface TokenListItemProps {
   item: Token;
@@ -17,6 +18,12 @@ const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
         <SvgUri width="36" height="36" uri={item.icon} style={styles.icon} />
       );
     return <Image source={{ uri: item.icon }} style={styles.icon} />;
+  };
+
+  const renderArrow = () => {
+    if (item.twentyFourHourChange >= 0)
+      return <Ionicons name="caret-up" size={11} color="green" />;
+    return <Ionicons name="caret-down" size={11} color="red" />;
   };
 
   const tokenDisplayCode = item.code.split('_')[0].toUpperCase();
@@ -35,22 +42,29 @@ const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
       <View style={styles.infoContainer}>
         <View style={styles.infoRow}>
           <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.price}>R{item.price}</Text>
+          <Text style={styles.price}>R{item.price.toFixed(2)}</Text>
         </View>
         <View style={styles.infoRow}>
           <View style={styles.codeAndNetworkContainer}>
             <Text style={styles.code}>{tokenDisplayCode}</Text>
             <Text style={styles.seperator}>•</Text>
-            <Text style={styles.network}>{capitalizedNetworkCode}</Text>
+            <Text>{capitalizedNetworkCode}</Text>
           </View>
-          <Text
-            style={{
-              ...styles.twentyFourHourPriceChange,
-              ...(true ? styles.positive : styles.negative),
-            }}
-          >
-            {item.twentyFourHourChange && item.twentyFourHourChange.toFixed(2)}%
-          </Text>
+
+          {item.twentyFourHourChange && (
+            <View style={styles.twentyFourHourPriceChangeContainer}>
+              {renderArrow()}
+              <Text
+                style={{
+                  ...(item.twentyFourHourChange >= 0
+                    ? styles.positive
+                    : styles.negative),
+                }}
+              >
+                {item.twentyFourHourChange.toFixed(2)}%
+              </Text>
+            </View>
+          )}
         </View>
       </View>
     </View>
@@ -104,8 +118,10 @@ const styles = StyleSheet.create({
     marginLeft: 2,
     marginRight: 2,
   },
-  twentyFourHourPriceChange: {
+  twentyFourHourPriceChangeContainer: {
     marginLeft: 'auto',
+    flexDirection: 'row',
+    alignItems: 'center',
   },
 });
 
