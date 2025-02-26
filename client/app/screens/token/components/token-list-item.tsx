@@ -65,9 +65,11 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   iconContainer: {
+    borderRadius: 18,
     width: 36,
     height: 36,
     marginRight: 12,
+    overflow: 'hidden',
   },
   infoContainer: {
     flex: 1,

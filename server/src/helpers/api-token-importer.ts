@@ -10,6 +10,7 @@
 import fetch from 'node-fetch';
 import { AppDataSource } from '../data-source';
 import { Token } from '../entity/Token';
+import '../utils/array-utils';
 
 const CURRENCIES_URL = 'https://api.moonpay.com/v3/currencies';
 
@@ -26,6 +27,27 @@ type TokenType = {
   supportsLiveMode: boolean;
 };
 
+const tokenPriceRequestIds = {
+  aave: 'aave',
+  ada: 'cardano',
+  algo: 'algorand',
+  ape: 'ape',
+  apt: 'aptos',
+  arkm_arb: 'arkham',
+  arkm_eth: 'arkham',
+  atom: 'cosmos',
+  blur_eth: 'blur',
+  bnb_bsc: 'binancecoin',
+  btc: 'bitcoin',
+  cati_ton: 'catizen',
+  cgpt_bsc: 'chaingpt',
+  chz: 'chiliz',
+  comp: 'compound',
+  cookie_bsc: 'cookie',
+  core: 'core',
+  cro_eth: 'cronos',
+};
+
 const getCurrencyData = async (): Promise<TokenType[] | undefined> => {
   console.log(`Pulling data from ${CURRENCIES_URL}`);
   const response = await fetch(CURRENCIES_URL);
@@ -40,23 +62,32 @@ const getCurrencyData = async (): Promise<TokenType[] | undefined> => {
 AppDataSource.initialize()
   .then(async () => {
     const tokenRepository = AppDataSource.getRepository(Token);
+    tokenRepository.clear();
     const data = await getCurrencyData();
-    const tokens = data
+    const allTokenProps = data
       .slice(0, 40) //grab first 40
       .filter((currency) => currency.type === 'crypto') //only crypto, no fiat.
-      .map((currency) => ({
-        id: currency.id,
-        name: currency.name,
-        code: currency.code,
-        icon: currency.icon,
-        networkCode: currency.metadata.networkCode.split('_').join(' '),
-        supportsTestMode: currency.supportsTestMode,
-        supportsLiveMode: currency.supportsLiveMode,
+      .filter((token) => Object.keys(tokenPriceRequestIds).includes(token.code))
+      .map((token) => ({
+        id: token.id,
+        name: token.name,
+        code: token.code,
+        icon: token.icon,
+        networkCode: token.metadata.networkCode.split('_').join(' '),
+        supportsTestMode: token.supportsTestMode,
+        supportsLiveMode: token.supportsLiveMode,
       }))
-      .forEach(async (tokenProps) => {
+      .forEachAsync(async (tokenProps) => {
         const token = Object.assign(new Token(), tokenProps);
         await tokenRepository.save(token);
         console.log('Saved token:' + token.code);
       });
+
+    // to preserver async order we're using
+    // for (let tokenProps of allTokenProps) {
+    //   const token = Object.assign(new Token(), tokenProps);
+    //   await tokenRepository.save(token);
+    //   console.log('Saved token:' + token.code);
+    // }
   })
   .catch((error) => console.log(error));
