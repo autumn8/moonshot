@@ -9,16 +9,23 @@ import {
 import { FlatList } from 'react-native-reanimated/src/Animated';
 import TokenListItem from './token-list-item';
 
-const TokenList = () => {
+type TokenListProps = {
+  filterTerm: string;
+};
+
+const TokenList: React.FC<TokenListProps> = ({ filterTerm }) => {
   const { error, loading, tokens } = useTokens();
   if (error) return <Text>Error</Text>; //TODO: add actual error handler
   if (loading) return <ActivityIndicatorComponent />;
+  const filteredTokens = tokens.filter((token) =>
+    token.name.toLowerCase().includes(filterTerm.toLowerCase())
+  );
 
   return (
     <>
       <FlatList
         style={styles.list}
-        data={tokens}
+        data={filteredTokens}
         keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => <TokenListItem item={item} />}
       />

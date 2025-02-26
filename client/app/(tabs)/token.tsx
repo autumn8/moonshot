@@ -1,14 +1,16 @@
 import { StyleSheet, Text, View } from 'react-native';
 import TokenHeader from '../screens/token/components/token-header';
-import TokenSearch from '../screens/token/components/token-search';
+import TokenFilter from '../screens/token/components/token-filter';
 import TokenList from '../screens/token/components/token-list';
+import { useState } from 'react';
 
 export default function TokenScreen() {
+  const [filterTerm, setFilterTerm] = useState('');
   return (
     <View style={styles.container}>
       <TokenHeader />
-      <TokenSearch />
-      <TokenList />
+      <TokenFilter onChange={setFilterTerm} />
+      <TokenList filterTerm={filterTerm} />
     </View>
   );
 }
