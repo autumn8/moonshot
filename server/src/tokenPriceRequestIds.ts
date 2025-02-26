@@ -1,0 +1,18 @@
+export const tokenPriceRequestIds = {
+  aave: 'aave',
+  ada: 'cardano',
+  algo: 'algorand',
+  ape: 'ape',
+  apt: 'aptos',
+  arkm_arb: 'arkham',
+  arkm_eth: 'arkham',
+  atom: 'cosmos',
+  bnb_bsc: 'binancecoin',
+  btc: 'bitcoin',
+  cati_ton: 'catizen',
+  cgpt_bsc: 'chaingpt',
+  chz: 'chiliz',
+  cookie_bsc: 'cookie',
+  core: 'core',
+  cro_eth: 'cronos',
+};

@@ -5,6 +5,8 @@ export type Token = {
   code: string;
   icon: string;
   networkCode: string;
+  price: number;
+  twentyFourHourChange: number;
 };
 
 export type MoonError = {

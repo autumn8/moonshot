@@ -11,6 +11,7 @@ import fetch from 'node-fetch';
 import { AppDataSource } from '../data-source';
 import { Token } from '../entity/Token';
 import '../utils/array-utils';
+import { tokenPriceRequestIds } from '../tokenPriceRequestIds';
 
 const CURRENCIES_URL = 'https://api.moonpay.com/v3/currencies';
 
@@ -25,27 +26,6 @@ type TokenType = {
   };
   supportsTestMode: boolean;
   supportsLiveMode: boolean;
-};
-
-const tokenPriceRequestIds = {
-  aave: 'aave',
-  ada: 'cardano',
-  algo: 'algorand',
-  ape: 'ape',
-  apt: 'aptos',
-  arkm_arb: 'arkham',
-  arkm_eth: 'arkham',
-  atom: 'cosmos',
-  blur_eth: 'blur',
-  bnb_bsc: 'binancecoin',
-  btc: 'bitcoin',
-  cati_ton: 'catizen',
-  cgpt_bsc: 'chaingpt',
-  chz: 'chiliz',
-  comp: 'compound',
-  cookie_bsc: 'cookie',
-  core: 'core',
-  cro_eth: 'cronos',
 };
 
 const getCurrencyData = async (): Promise<TokenType[] | undefined> => {
@@ -65,8 +45,8 @@ AppDataSource.initialize()
     tokenRepository.clear();
     const data = await getCurrencyData();
     const allTokenProps = data
-      .slice(0, 40) //grab first 40
-      .filter((currency) => currency.type === 'crypto') //only crypto, no fiat.
+      .slice(0, 40)
+      .filter((currency) => currency.type === 'crypto')
       .filter((token) => Object.keys(tokenPriceRequestIds).includes(token.code))
       .map((token) => ({
         id: token.id,
@@ -82,12 +62,5 @@ AppDataSource.initialize()
         await tokenRepository.save(token);
         console.log('Saved token:' + token.code);
       });
-
-    // to preserver async order we're using
-    // for (let tokenProps of allTokenProps) {
-    //   const token = Object.assign(new Token(), tokenProps);
-    //   await tokenRepository.save(token);
-    //   console.log('Saved token:' + token.code);
-    // }
   })
   .catch((error) => console.log(error));

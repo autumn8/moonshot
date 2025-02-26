@@ -5,6 +5,7 @@ import cors from 'cors';
 import { Token } from './entity/Token';
 import { authenticateApiKey } from './middleware/authenticate-api-key';
 import fetch from 'node-fetch';
+import { tokenPriceRequestIds } from './tokenPriceRequestIds';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -20,14 +21,14 @@ app.use(
   })
 );
 
-const getPriceDataForTokens = async (tokens: Token[]) => {
-  const tokenCodes = tokens.map(({ code }) => code.split('_')[0]).join(',');
-  console.log(tokenCodes);
+const getPriceDataForTokens = async (tokenCodes) => {
+  const COINGECKO_PRICE_API_URL =
+    'https://api.coingecko.com/api/v3/simple/price';
   const response = await fetch(
-    `https://api.coingecko.com/api/v3/simple/price?ids=${tokenCodes}e&vs_currencies=zar&include_24hr_change=true`
+    `${COINGECKO_PRICE_API_URL}?ids=${tokenCodes}&vs_currencies=zar&include_24hr_change=true`
   );
   const data = await response.json();
-  console.log(data);
+  return data;
 };
 
 AppDataSource.initialize()
@@ -40,7 +41,18 @@ AppDataSource.initialize()
       async (req: Request, res: Response) => {
         try {
           const tokens = await tokenRepository.find();
-          //const tokensWithPriceData = await getPriceDataForTokens(tokens);
+          const tokenPriceData = await getPriceDataForTokens(
+            Object.values(tokenPriceRequestIds)
+          );
+          Object.entries(tokenPriceData).forEach(([key, value]) => {
+            const token = tokens.find(
+              (token) => tokenPriceRequestIds[token.code] === key
+            );
+            if (token) {
+              token['price'] = value.zar;
+              token['twentyFourHourChange'] = value.zar_24h_change;
+            }
+          });
           res.status(200).json(tokens);
         } catch (error) {
           res.status(500).json({ message: 'Error retrieving tokens' });

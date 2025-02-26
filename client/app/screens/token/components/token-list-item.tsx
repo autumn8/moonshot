@@ -26,13 +26,16 @@ const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 
+  // const isNegativeChange = (amount: number) =>
+  //   amount.toString().
+
   return (
     <View style={styles.container}>
       <View style={styles.iconContainer}>{renderIcon()}</View>
       <View style={styles.infoContainer}>
         <View style={styles.infoRow}>
           <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.price}>R4.60</Text>
+          <Text style={styles.price}>R{item.price}</Text>
         </View>
         <View style={styles.infoRow}>
           <View style={styles.codeAndNetworkContainer}>
@@ -43,10 +46,10 @@ const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
           <Text
             style={{
               ...styles.twentyFourHourPriceChange,
-              ...(false ? styles.positive : styles.negative),
+              ...(true ? styles.positive : styles.negative),
             }}
           >
-            -3.71%
+            {item.twentyFourHourChange && item.twentyFourHourChange.toFixed(2)}%
           </Text>
         </View>
       </View>
@@ -96,6 +99,10 @@ const styles = StyleSheet.create({
   price: {
     marginLeft: 'auto',
     fontWeight: '600',
+  },
+  seperator: {
+    marginLeft: 2,
+    marginRight: 2,
   },
   twentyFourHourPriceChange: {
     marginLeft: 'auto',
