@@ -1,6 +1,8 @@
 # Project Title
 
-Typeorm/express rest backend for the moonshot client
+Typeorm/express rest backend for the moonshot client. The db can be seeded with token data from the moonpay v3 currencies api endpoint.
+
+Price data is retrieved for the tokens in the db from congecko at request time to give accurate price data for the demo, and returned with the token data. 
 
 ## Getting Started
 1. Run `npm i` to install dependencies
