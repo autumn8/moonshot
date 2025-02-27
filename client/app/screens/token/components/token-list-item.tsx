@@ -1,43 +1,18 @@
 import { View } from 'react-native-reanimated/src/Animated';
-import { Image, Text, StyleSheet, Pressable } from 'react-native';
-import { SvgUri } from 'react-native-svg';
-import { Token } from '@/app/services/tokens.types';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { Text, StyleSheet, Pressable } from 'react-native';
 
-interface TokenListItemProps {
-  item: Token;
-}
+import { useRouter } from 'expo-router';
+import { TokenListItemProps } from './token-list-item.types';
+import {
+  getCapitalizedNetworkCode,
+  getTokenDisplayCode,
+  priceFormatter,
+} from './token-list-item.utils';
+import SvgOrImageIcon from './svg-or-image-icon';
+import TwentyFourHourChange from './twent-four-hour-change';
 
 const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
-  const isSvg = item.icon.toLowerCase().endsWith('.svg');
   const router = useRouter();
-
-  const renderIcon = isSvg ? (
-    <SvgUri width="36" height="36" uri={item.icon} style={styles.icon} />
-  ) : (
-    <Image source={{ uri: item.icon }} style={styles.icon} />
-  );
-
-  const renderArrow =
-    item.twentyFourHourChange >= 0 ? (
-      <Ionicons name="caret-up" size={11} color="green" />
-    ) : (
-      <Ionicons name="caret-down" size={11} color="red" />
-    );
-
-  const tokenDisplayCode = item.code.split('_')[0].toUpperCase();
-  const capitalizedNetworkCode = item.networkCode
-    .toLowerCase()
-    .split(' ')
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(' ');
-
-  const priceFormatter = new Intl.NumberFormat('en-ZA', {
-    style: 'currency',
-    currency: 'ZAR',
-    minimumFractionDigits: 2,
-  });
 
   const onPress = () => {
     router.push(`/token/${item.id}`);
@@ -49,7 +24,9 @@ const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
       onPress={onPress}
       unstable_pressDelay={20}
     >
-      <View style={styles.iconContainer}>{renderIcon}</View>
+      <View style={styles.iconContainer}>
+        <SvgOrImageIcon fileName={item.icon} />
+      </View>
       <View style={styles.infoContainer}>
         <View style={styles.infoRow}>
           <Text style={styles.name}>{item.name}</Text>
@@ -57,24 +34,15 @@ const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
         </View>
         <View style={styles.infoRow}>
           <View style={styles.codeAndNetworkContainer}>
-            <Text style={styles.code}>{tokenDisplayCode}</Text>
+            <Text style={styles.code}>{getTokenDisplayCode(item.code)}</Text>
             <Text style={styles.seperator}>•</Text>
-            <Text>{capitalizedNetworkCode}</Text>
+            <Text>{getCapitalizedNetworkCode(item.code)}</Text>
           </View>
 
           {item.twentyFourHourChange && (
-            <View style={styles.twentyFourHourPriceChangeContainer}>
-              {renderArrow}
-              <Text
-                style={{
-                  ...(item.twentyFourHourChange >= 0
-                    ? styles.positive
-                    : styles.negative),
-                }}
-              >
-                {item.twentyFourHourChange.toFixed(2)}%
-              </Text>
-            </View>
+            <TwentyFourHourChange
+              twentyFourHourChange={item.twentyFourHourChange}
+            />
           )}
         </View>
       </View>
@@ -94,8 +62,8 @@ const styles = StyleSheet.create({
   },
   iconContainer: {
     borderRadius: 18,
-    width: 36,
-    height: 36,
+    width: 40,
+    height: 40,
     marginRight: 12,
     overflow: 'hidden',
   },
@@ -107,19 +75,9 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
   },
-  icon: {
-    width: 36,
-    height: 36,
-  },
   name: {
     fontWeight: 600,
     fontSize: 16,
-  },
-  negative: {
-    color: 'red',
-  },
-  positive: {
-    color: 'green',
   },
   pressed: {
     backgroundColor: 'rgb(236 234 234)',
@@ -133,11 +91,6 @@ const styles = StyleSheet.create({
   seperator: {
     marginLeft: 2,
     marginRight: 2,
-  },
-  twentyFourHourPriceChangeContainer: {
-    marginLeft: 'auto',
-    flexDirection: 'row',
-    alignItems: 'center',
   },
 });
 
