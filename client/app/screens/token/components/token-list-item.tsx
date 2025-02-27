@@ -1,9 +1,9 @@
-import { Currency } from '@/app/services/currencies.types';
 import { View } from 'react-native-reanimated/src/Animated';
-import { Image, Text, StyleSheet } from 'react-native';
+import { Image, Text, StyleSheet, Pressable } from 'react-native';
 import { SvgUri } from 'react-native-svg';
 import { Token } from '@/app/services/tokens.types';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { useRouter } from 'expo-router';
 
 interface TokenListItemProps {
   item: Token;
@@ -11,20 +11,20 @@ interface TokenListItemProps {
 
 const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
   const isSvg = item.icon.toLowerCase().endsWith('.svg');
+  const router = useRouter();
 
-  const renderIcon = () => {
-    if (isSvg)
-      return (
-        <SvgUri width="36" height="36" uri={item.icon} style={styles.icon} />
-      );
-    return <Image source={{ uri: item.icon }} style={styles.icon} />;
-  };
+  const renderIcon = isSvg ? (
+    <SvgUri width="36" height="36" uri={item.icon} style={styles.icon} />
+  ) : (
+    <Image source={{ uri: item.icon }} style={styles.icon} />
+  );
 
-  const renderArrow = () => {
-    if (item.twentyFourHourChange >= 0)
-      return <Ionicons name="caret-up" size={11} color="green" />;
-    return <Ionicons name="caret-down" size={11} color="red" />;
-  };
+  const renderArrow =
+    item.twentyFourHourChange >= 0 ? (
+      <Ionicons name="caret-up" size={11} color="green" />
+    ) : (
+      <Ionicons name="caret-down" size={11} color="red" />
+    );
 
   const tokenDisplayCode = item.code.split('_')[0].toUpperCase();
   const capitalizedNetworkCode = item.networkCode
@@ -33,16 +33,27 @@ const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 
-  // const isNegativeChange = (amount: number) =>
-  //   amount.toString().
+  const priceFormatter = new Intl.NumberFormat('en-ZA', {
+    style: 'currency',
+    currency: 'ZAR',
+    minimumFractionDigits: 2,
+  });
+
+  const onPress = () => {
+    router.push(`/token/${item.id}`);
+  };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.iconContainer}>{renderIcon()}</View>
+    <Pressable
+      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+      onPress={onPress}
+      unstable_pressDelay={20}
+    >
+      <View style={styles.iconContainer}>{renderIcon}</View>
       <View style={styles.infoContainer}>
         <View style={styles.infoRow}>
           <Text style={styles.name}>{item.name}</Text>
-          <Text style={styles.price}>R{item.price.toFixed(2)}</Text>
+          <Text style={styles.price}>{priceFormatter.format(item.price)}</Text>
         </View>
         <View style={styles.infoRow}>
           <View style={styles.codeAndNetworkContainer}>
@@ -53,7 +64,7 @@ const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
 
           {item.twentyFourHourChange && (
             <View style={styles.twentyFourHourPriceChangeContainer}>
-              {renderArrow()}
+              {renderArrow}
               <Text
                 style={{
                   ...(item.twentyFourHourChange >= 0
@@ -67,7 +78,7 @@ const TokenListItem: React.FC<TokenListItemProps> = ({ item }) => {
           )}
         </View>
       </View>
-    </View>
+    </Pressable>
   );
 };
 
@@ -109,6 +120,11 @@ const styles = StyleSheet.create({
   },
   positive: {
     color: 'green',
+  },
+  pressed: {
+    backgroundColor: 'rgb(236 234 234)',
+    borderRadius: 10,
+    opacity: 0.9,
   },
   price: {
     marginLeft: 'auto',
